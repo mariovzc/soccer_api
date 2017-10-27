@@ -1,7 +1,6 @@
 module.exports = function (app, express) {
   let User = require('./models/user') // get our mongoose model
   let jwt = require('jsonwebtoken') // used to create, sign, and verify tokens
-  let assert = require('assert')
   // =======================
   // routes ================
   // =======================
@@ -70,14 +69,14 @@ module.exports = function (app, express) {
   apiRoutes.post('/authenticate', function (req, res) {
     // find the user
     User.findOne({
-      name: req.body.name
+      email: req.body.email
     }, function (err, user) {
       if (err) throw err
       if (!user) {
         res.json({ success: false, message: 'Authentication failed. User not found.' })
       } else if (user) {
         // check if password matches
-        if (user.password !== req.body.password) {
+        if (user.password != req.body.password) {
           res.json({ success: false, message: 'Authentication failed. Wrong password.' })
         } else {
           // if user is found and password is right
@@ -85,6 +84,10 @@ module.exports = function (app, express) {
           // we don't want to pass in the entire user since that has the password
           var token = jwt.sign(toString('hex'), app.get('superSecret'))
           // return the information including token as JSON
+          if (user) {
+            user.token = token
+            user.save()
+          }
           res.json({
             success: true,
             message: 'Enjoy your token!',

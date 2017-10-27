@@ -11,6 +11,12 @@ module.exports = function (app, express) {
 
   // get an instance of the router for api routes
   let apiRoutes = express.Router()
+  const config = {
+    headers: {
+      'X-Auth-Token': '8a20e4c9c79446ac8b913a5140578f14',
+      'X-Response-Control': 'minified'
+    }
+  }
 
   // route middleware to verify a token
   function isLoggedIn (req, res, next) {
@@ -113,19 +119,19 @@ module.exports = function (app, express) {
   })
   apiRoutes.get('/all', isLoggedIn, function (req, res) {
     res.setHeader('Content-Type', 'application/json')
-    axios.get('http://api.football-data.org/v1/soccerseasons')
+    axios.get('http://api.football-data.org/v1/soccerseasons', config)
     .then(function (response) {
       res.json(response.data)
     })
   })
   apiRoutes.get('/leage/:id', isLoggedIn, function (req, res) {
-    axios.get('http://api.football-data.org/v1/soccerseasons/' + req.params.id + '/leagueTable')
+    axios.get('http://api.football-data.org/v1/soccerseasons/' + req.params.id + '/leagueTable', config)
     .then(function (response) {
       res.json(response.data)
     })
   })
   apiRoutes.get('/team/:id', isLoggedIn, function (req, res) {
-    axios.get('http://api.football-data.org/v1/soccerseasons/' + req.params.id + '/teams')
+    axios.get('http://api.football-data.org/v1/soccerseasons/' + req.params.id + '/teams', config)
     .then(function (response) {
       res.json(response.data)
     })

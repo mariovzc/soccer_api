@@ -60,10 +60,23 @@ module.exports = function (app, express) {
   })
 
   // route to return all users (GET http://localhost:8080/api/users)
-  apiRoutes.get('/users', isLoggedIn, function (req, res) {
-    User.find({}, function (err, users) {
-      res.json(users)
-    })
+  apiRoutes.get('/user', isLoggedIn, function (req, res) {
+    const token = req.body.token || req.query.token || req.headers['x-access-token']    
+    if (token) {
+      User.find({
+        token: token
+      }, function (err, users) {
+        if (err) throw err
+        res.json(users)
+      })
+    } else {
+      // if there is no token
+      // return an error
+      return res.status(403).send({
+        success: false,
+        message: 'No token provided.'
+      })
+    }
   })
   //  AUTHENTICATE USER
   apiRoutes.post('/authenticate', function (req, res) {
@@ -82,7 +95,7 @@ module.exports = function (app, express) {
           // if user is found and password is right
           // create a token with only our given payload
           // we don't want to pass in the entire user since that has the password
-          var token = jwt.sign(toString('hex'), app.get('superSecret'))
+          var token = jwt.sign({id: user.id}, app.get('superSecret'))
           // return the information including token as JSON
           if (user) {
             user.token = token

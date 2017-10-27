@@ -1,6 +1,7 @@
 module.exports = function (app, express) {
   let User = require('./models/user') // get our mongoose model
   let jwt = require('jsonwebtoken') // used to create, sign, and verify tokens
+  let axios = require('axios')
   // =======================
   // routes ================
   // =======================
@@ -108,6 +109,25 @@ module.exports = function (app, express) {
           })
         }
       }
+    })
+  })
+  apiRoutes.get('/all', isLoggedIn, function (req, res) {
+    res.setHeader('Content-Type', 'application/json')
+    axios.get('http://api.football-data.org/v1/soccerseasons')
+    .then(function (response) {
+      res.json(response.data)
+    })
+  })
+  apiRoutes.get('/leage/:id', isLoggedIn, function (req, res) {
+    axios.get('http://api.football-data.org/v1/soccerseasons/' + req.params.id + '/leagueTable')
+    .then(function (response) {
+      res.json(response.data)
+    })
+  })
+  apiRoutes.get('/team/:id', isLoggedIn, function (req, res) {
+    axios.get('http://api.football-data.org/v1/soccerseasons/' + req.params.id + '/teams')
+    .then(function (response) {
+      res.json(response.data)
     })
   })
   app.use('/api', apiRoutes)

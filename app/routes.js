@@ -1,6 +1,7 @@
 module.exports = function (app, express) {
   let User = require('./models/user') // get our mongoose model
   let jwt = require('jsonwebtoken') // used to create, sign, and verify tokens
+  let assert = require('assert')
   // =======================
   // routes ================
   // =======================
@@ -42,14 +43,18 @@ module.exports = function (app, express) {
     res.json({ message: 'Welcome to the coolest API on earth!' })
   })
 
-  apiRoutes.post('/user/new', function (req, res) {
+  apiRoutes.post('/users', function (req, res) {
     const newUser = new User({
-      name: req.body.name,
+      email: req.body.email,
       password: req.body.password,
       leage: req.body.leage
     })
     newUser.save(function (err) {
-      if (err) throw err
+      if (err) {
+        res.status(400)
+        res.json({success: false})
+      }
+
       console.log('User saved successfully')
       res.json({ success: true })
     })

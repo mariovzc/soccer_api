@@ -3,6 +3,7 @@ var app = express()
 var bodyParser = require('body-parser')
 var morgan = require('morgan')
 var mongoose = require('mongoose')
+var cors = require('cors')
 
 var config = require('./config') // get our config file
 
@@ -18,7 +19,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 // use morgan to log requests to the console
 app.use(morgan('dev'))
-
+app.use(cors())
 require('./app/routes.js')(app, express)
 
 // =======================
